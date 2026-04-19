@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String?
+  firstName String
+  lastName  String
+  picture   String?
+  googleId  String?   @unique
+  role      UserRole  @default(CURSANTE)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  payments  Payment[]
+  pedidos   Pedido[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cartilla {
+  id          String             @id @default(cuid())
+  titulo      String
+  descripcion String?
+  autor       String
+  materia     String
+  carrera     String
+  precio      Float
+  cantidad    Int                @default(0)
+  imagen      String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  pedidos     CartillaEnPedido[]
+  etiquetas   Etiqueta[]         @relation("CartillaToEtiqueta")
+}
+
+model Etiqueta {
+  id          String     @id @default(cuid())
+  nombre      String     @unique
+  descripcion String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  cartillas   Cartilla[] @relation("CartillaToEtiqueta")
+
+  @@map("etiquetas")
+}
+
+model Pedido {
+  id             String             @id @default(cuid())
+  numeroOrden    String             @unique @default(cuid())
+  usuarioId      String
+  estado         CartillaStatus     @default(PENDIENTE)
+  metodo_pago    PaymentMethod
+  cantidad_total Int
+  precio_total   Float
+  observaciones  String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  cartillas      CartillaEnPedido[]
+  payment        Payment?
+  usuario        User               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([estado])
+  @@index([createdAt])
+}
+
+model CartillaEnPedido {
+  id              String   @id @default(cuid())
+  pedidoId        String
+  cartillaId      String
+  cantidad        Int
+  precio_unitario Float
+  subtotal        Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  cartilla        Cartilla @relation(fields: [cartillaId], references: [id])
+  pedido          Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  @@unique([pedidoId, cartillaId])
+  @@index([pedidoId])
+  @@index([cartillaId])
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  pedidoId            String        @unique
+  usuarioId           String
+  metodo              PaymentMethod
+  monto               Float
+  comprobante_url     String?
+  id_comprobante      String?
+  fecha_transferencia DateTime?
+  entregado_por       String?
+  fecha_recepcion     DateTime?
+  estado              String        @default("pendiente")
+  observaciones       String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  pedido              Pedido        @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  usuario             User          @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId])
+  @@index([estado])
+  @@index([createdAt])
+}
+
+model DatosBancarios {
+  id                String   @id @default(cuid())
+  alias            String
+  cbu              String   @unique
+  numeroCuenta     String
+  titular          String
+  nombreBanco     String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Dashboard {
+  id                String   @id @default(cuid())
+  fecha             DateTime @default(now())
+  total_pedidos       Int      @default(0)
+  total_ganancias     Float    @default(0)
+  pedidos_pendientes  Int      @default(0)
+  pedidos_completados Int      @default(0)
+  pedidos_cancelados  Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  EMPLEADO
+  CURSANTE
+}
+
+enum CartillaStatus {
+  PENDIENTE
+  COMPLETADO
+  CANCELADO
+  PAGADO
+}
+
+enum PaymentMethod {
+  TRANSFERENCIA
+  EFECTIVO
+}
