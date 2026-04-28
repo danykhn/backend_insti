@@ -31,6 +31,7 @@
       "@pagos/*": ["src/pagos/*"],
       "@websockets/*": ["src/websockets/*"],
       "@datos-bancarios/*": ["src/datos-bancarios/*"],
+      "@mercadopago/*": ["src/mercadopago/*"],
       "@guards": ["src/guards"],
       "@decorators": ["src/decorators"]
     }

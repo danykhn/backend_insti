@@ -97,22 +97,25 @@ model CartillaEnPedido {
 }
 
 model Payment {
-  id                  String        @id @default(cuid())
-  pedidoId            String        @unique
-  usuarioId           String
-  metodo              PaymentMethod
-  monto               Float
-  comprobante_url     String?
-  id_comprobante      String?
-  fecha_transferencia DateTime?
-  entregado_por       String?
-  fecha_recepcion     DateTime?
-  estado              String        @default("pendiente")
-  observaciones       String?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  pedido              Pedido        @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  usuario             User          @relation(fields: [usuarioId], references: [id])
+  id                   String        @id @default(cuid())
+  pedidoId             String        @unique
+  usuarioId            String
+  metodo               PaymentMethod
+  monto                Float
+  comprobante_url      String?
+  id_comprobante       String?
+  fecha_transferencia  DateTime?
+  entregado_por        String?
+  fecha_recepcion      DateTime?
+  estado               String        @default("pendiente")
+  observaciones        String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  mercadoPagoOrderId   String?
+  mercadoPagoPaymentId String?
+  mercadoPagoStatus    String?
+  pedido               Pedido        @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  usuario              User          @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
   @@index([estado])
@@ -120,20 +123,20 @@ model Payment {
 }
 
 model DatosBancarios {
-  id                String   @id @default(cuid())
-  alias            String
-  cbu              String   @unique
-  numeroCuenta     String
-  titular          String
-  nombreBanco     String
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  alias        String
+  cbu          String   @unique
+  numeroCuenta String
+  titular      String
+  nombreBanco  String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Dashboard {
-  id                String   @id @default(cuid())
-  fecha             DateTime @default(now())
+  id                  String   @id @default(cuid())
+  fecha               DateTime @default(now())
   total_pedidos       Int      @default(0)
   total_ganancias     Float    @default(0)
   pedidos_pendientes  Int      @default(0)

@@ -9,6 +9,7 @@ import { PedidosModule } from '@pedidos/pedidos.module';
 import { PagosModule } from '@pagos/pagos.module';
 import { WebSocketsModule } from '@websockets/websockets.module';
 import { DatosBancariosModule } from '@datos-bancarios/datos-bancarios.module';
+import { MercadoPagoModule } from '@mercadopago/mercadopago.module';
 import { PrismaService } from '@database/prisma.service';
 
 @Module({
@@ -21,6 +22,7 @@ import { PrismaService } from '@database/prisma.service';
     PagosModule,
     WebSocketsModule,
     DatosBancariosModule,
+    MercadoPagoModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDateString, IsNumber } from 'class-validator';
 import { PaymentMethod } from '@prisma/client';
 
 export class RegistrarPagoTransferenciaDto {
@@ -13,7 +13,7 @@ export class RegistrarPagoTransferenciaDto {
 
   @IsString()
   @IsOptional()
-  comprobante_url?: string; // URL del archivo subido
+  comprobante_url?: string;
 }
 
 export class RegistrarPagoEfectivoDto {
@@ -23,6 +23,19 @@ export class RegistrarPagoEfectivoDto {
   @IsString()
   @IsOptional()
   entregado_por?: string;
+}
+
+export class CrearPagoMercadoPagoDto {
+  @IsString()
+  pedidoId: string;
+
+  @IsString()
+  @IsOptional()
+  paymentMethodId?: string;
+
+  @IsNumber()
+  @IsOptional()
+  installments?: number;
 }
 
 export class VerificarPagoDto {

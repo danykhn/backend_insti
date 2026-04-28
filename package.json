@@ -25,7 +25,6 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "seed": "ts-node prisma/seed.ts"
-    
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -44,6 +43,8 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^16.3.1",
+    "mercadopago": "^2.12.0",
+    "node-fetch": "^3.3.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
