@@ -204,16 +204,34 @@ export class MercadoPagoService {
   }
 
   async getPayment(paymentId: string) {
-    return this.makeRequest(`/payments/${paymentId}`, { method: 'GET' });
+    // El endpoint correcto para pagos es /v1/payments
+    return this.makeRequest(`/v1/payments/${paymentId}`, { method: 'GET' });
+  }
+
+  async getPaymentByPreference(preferenceId: string) {
+    // Buscar pagos por preference_id
+    const result = await this.makeRequest(`/checkout/payments/search`, {
+      method: 'GET',
+    });
+    return result;
   }
 
   async processWebhook(body: any) {
-    const { type, data } = body;
+    const { type, data, topic } = body;
 
-    if (type === 'payment' || body.topic === 'payment') {
+    // Handle topic payment
+    if (topic === 'payment' || type === 'payment') {
       const paymentId = data?.id || body.data?.id;
       if (paymentId) {
         return this.getPayment(paymentId);
+      }
+    }
+
+    // Handle topic merchant_order (más común para webhook)
+    if (topic === 'merchant_order' || body.topic === 'merchant_order') {
+      const merchantOrderId = data?.id || body.data?.id;
+      if (merchantOrderId) {
+        return this.makeRequest(`/merchant_orders/${merchantOrderId}`, { method: 'GET' });
       }
     }
 
