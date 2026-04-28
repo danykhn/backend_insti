@@ -85,10 +85,12 @@ export class MercadoPagoController {
       payerEmail: usuario?.email || '',
     })) as any;
 
-    // En sandbox usar sandbox_init_point; en producción usar init_point
-    const paymentUrl = this.mercadoPagoService.isSandbox
-      ? order.sandbox_init_point || order.init_point
-      : order.init_point || order.sandbox_init_point;
+    // Elegir el init point que devuelve Mercado Pago sin asumir entorno por backend.
+    const paymentUrl = order.init_point || order.sandbox_init_point;
+
+    if (!paymentUrl) {
+      throw new Error('Mercado Pago no devolvió init_point para redirección');
+    }
 
     await this.prisma.payment.upsert({
       where: { pedidoId },
