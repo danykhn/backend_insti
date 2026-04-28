@@ -93,7 +93,7 @@ export class MercadoPagoController {
     await this.prisma.payment.upsert({
       where: { pedidoId },
       update: {
-        mercadoPagoOrderId: order.id,
+        mercadoPagoOrderId: order.id as any,
         estado: 'pendiente',
       },
       create: {
@@ -101,7 +101,7 @@ export class MercadoPagoController {
         usuarioId: user.sub,
         metodo: 'TRANSFERENCIA',
         monto: pedido.precio_total,
-        mercadoPagoOrderId: order.id,
+        mercadoPagoOrderId: order.id as any,
         estado: 'pendiente',
       },
     });
@@ -176,10 +176,10 @@ export class MercadoPagoController {
           await this.prisma.payment.updateMany({
             where: { pedidoId: externalReference },
             data: {
-              mercadoPagoPaymentId: String(mpPayment.id),
-              mercadoPagoStatus: mpPayment.status,
+              mercadoPagoPaymentId: String(mpPayment.id) as any,
+              mercadoPagoStatus: mpPayment.status as any,
               estado,
-            },
+            } as any,
           });
 
           if (estado === 'verificado') {
