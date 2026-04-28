@@ -48,7 +48,8 @@ export class MercadoPagoController {
   })
   async crearOrden(
     @CurrentUser() user: any,
-    @Body() body: { pedidoId: string; paymentMethodId?: string; installments?: number },
+    @Body()
+    body: { pedidoId: string; paymentMethodId?: string; installments?: number },
   ) {
     const { pedidoId, paymentMethodId, installments } = body;
 
@@ -77,15 +78,17 @@ export class MercadoPagoController {
       .map((item) => `${item.cartilla.titulo} (x${item.cantidad})`)
       .join(', ');
 
-    const order = await this.mercadoPagoService.createOrder({
+    const order = (await this.mercadoPagoService.createOrder({
       externalReference: pedidoId,
       amount: pedido.precio_total,
       description: description || `Pedido #${pedido.numeroOrden}`,
       payerEmail: usuario?.email || '',
-    }) as any;
+    })) as any;
 
-    // La preference devuelve init_point para redirigir al pago
-    const paymentUrl = order.init_point || order.sandbox_init_point;
+    // En sandbox usar sandbox_init_point; en producción usar init_point
+    const paymentUrl = this.mercadoPagoService.isSandbox
+      ? order.sandbox_init_point || order.init_point
+      : order.init_point || order.sandbox_init_point;
 
     await this.prisma.payment.upsert({
       where: { pedidoId },
@@ -154,10 +157,10 @@ export class MercadoPagoController {
       const paymentData = body;
 
       if (paymentData.data?.id) {
-        const mpPayment = await this.mercadoPagoService.processWebhook({
+        const mpPayment = (await this.mercadoPagoService.processWebhook({
           type: 'payment',
           data: { id: paymentData.data.id },
-        }) as any;
+        })) as any;
 
         if (mpPayment) {
           const externalReference = mpPayment.external_reference;
@@ -238,7 +241,10 @@ export class MercadoPagoController {
     @Param('paymentId') paymentId: string,
     @Body() body: { amount?: number },
   ) {
-    const refund = await this.mercadoPagoService.refundPayment(paymentId, body.amount);
+    const refund = await this.mercadoPagoService.refundPayment(
+      paymentId,
+      body.amount,
+    );
     return refund;
   }
 }

@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 export class MercadoPagoService {
   private accessToken: string;
   private baseUrl: string;
+  public isSandbox: boolean;
 
   private isPublicHttpUrl(url: string): boolean {
     try {
@@ -28,14 +29,13 @@ export class MercadoPagoService {
     this.accessToken =
       this.configService.get<string>('MERCADO_PAGO_ACCESS_TOKEN') || '';
 
-    // Tokens que empiezan con TEST- son de sandbox
-    // Tokens APP_USR- también pueden ser de sandbox desde el dashboard
-    const isSandbox =
+    // Tokens TEST- son definitivamente sandbox; APP_USR- puede ser producción o sandbox
+    this.isSandbox =
       this.accessToken.startsWith('TEST-') ||
       this.accessToken.startsWith('APP_USR-');
     this.baseUrl = 'https://api.mercadopago.com';
 
-    if (isSandbox) {
+    if (this.isSandbox) {
       console.log(
         '🔞 Modo SANDBOX de Mercado Pago activado (credenciales de prueba)',
       );
